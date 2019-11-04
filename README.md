@@ -475,4 +475,39 @@ var token = jwtTokenBuilder
 
 return $"Bearer {token.Value}";
 ```
+#### AppSettings.json
+```json
+  "Token": {
+  	"PfxPath": "certificate.pfx",
+  	"PfxPassword": "xxxxxxxxxxxxxx",
+  	"SigningKey": "xxxxxxxxxxxxxx",
+  	"KeyId": "123454321",
+  	"ValidIssuer": "",
+  	"ValidAudience": "",
+  	"ExpiryInMinutes": 5,
+  	"RefreshTokenExpiryInMinutes": 60,
+  	"RSAConfig": {
+  		"Modulus": "xxxxxxxxxxxxxx==",
+  		"Exponent": "xxxx",
+  		"P": "xxxxxxxxxxxxxx=",
+  		"Q": "xxxxxxxxxxxxxx=",
+  		"DP": "xxxxxxxxxxxxxx=",
+  		"DQ": "xxxxxxxxxxxxxx=",
+  		"InverseQ": "xxxxxxxxxxxxxx=",
+  		"D": "xxxxxxxxxxxxxx=="
+  	}
+  }
+```
+#### Powershell Script To Create Public Key + Private Key For Asymmetric Token Signing
+Once the public and private keys are created, extract the XML values and put them in the appSettings.json file to serve as an input config for the Asymmetric Key based token signing.
+```bash
+$rsa = New-Object System.Security.Cryptography.RSACryptoServiceProvider -ArgumentList 2048
+$rsa.toXmlString($true) | Out-File $SavePath\private-key.xml
+$rsa.toXmlString($false) | Out-File $SavePath\public-key.xml 
+```
+#### Command To Create Certificate.PFX Using Visual Studio Developer Console
+```bash
+makecert -r -pe -n "CN=contoso.com" -sky exchange -sv contoso.com.pvk contoso.com.cer
 
+pvk2pfx -pvk contoso.com.pvk -spc contoso.com.cer -pfx contoso.com.pfx
+```
